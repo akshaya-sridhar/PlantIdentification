@@ -1,0 +1,255 @@
+<!doctype html>
+<html>
+{% block content %}
+{% load static %}
+
+<head>
+  <title>Camera</title>
+  <meta charset='utf-8'>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" media="all">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="{% static 'https://unpkg.com/swiper/swiper-bundle.min.css' %}" />
+
+  <!-- font awesome cdn link  -->
+  <link rel="stylesheet"
+    href="{% static 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css' %}">
+
+  <!-- custom css file link  -->
+  <link rel="stylesheet" href="{% static '/style.css' %}">
+</head>
+
+<body>
+  <!-- header section starts  -->
+
+  <header>
+
+    <div class="header-1">
+
+      {% comment %} <div class="share">
+        <span> follow us : </span>
+        <a href="#" class="fab fa-facebook-f"></a>
+        <a href="#" class="fab fa-twitter"></a>
+        <a href="#" class="fab fa-instagram"></a>
+        <a href="#" class="fab fa-linkedin"></a>
+      </div> {% endcomment %}
+
+      <div class="call">
+        <span> call us : </span>
+        <a href="#">+123-456-7890</a>
+      </div>
+
+    </div>
+
+    <div class="header-2">
+
+      <a href="#" class="logo"> <i class="fas fa-seedling"></i> LOGO </a>
+
+      <form action="" class="search-bar-container">
+        <input type="search" id="search-bar" placeholder="search here...">
+        <label for="search-bar" class="fas fa-search"></label>
+      </form>
+
+    </div>
+
+    <div class="header-3">
+
+      <div id="menu-bar" class="fas fa-bars"></div>
+
+      <nav class="navbar">
+        <a href="#home">home</a>
+        <a href="#category">category</a>
+        <a href="#product">product</a>
+        <a href="#deal">deal</a>
+        <a href="#contact">contact</a>
+      </nav>
+
+      <div class="icons">
+        <a href="#" class="fas fa-shopping-cart"></a>
+        <a href="#" class="fas fa-heart"></a>
+        <a href="#" class="fas fa-user-circle"></a>
+      </div>
+
+    </div>
+
+  </header>
+
+  <!-- header section ends -->
+
+  <div class="contentarea">
+    <div class="Input">
+      <form method="POST" name="inputForm" enctype='multipart/form-data'>
+        {% csrf_token %}
+        <div id="camera" class="camera">
+          <video id="video">Video stream not available.</video>
+          <button id="startbutton" type="button">Take photo</button>
+          <input id="webimg" value="" name="src" type="text" style="display: none;">
+          <canvas id="canvas">
+          </canvas>
+        </div>
+        <br>
+        <div>
+          <img id="photo" alt="your image">
+        </div>
+        <br>
+        <button type="submit" class="button" id="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- footer section starts  -->
+
+<section class="footer">
+
+  <div class="box-container">
+
+      <div class="box">
+          <h3>about us</h3>
+          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo hic eum veniam aut nisi. Libero autem nemo amet recusandae eveniet?</p>
+      </div>
+      <div class="box">
+          <h3>branch locations</h3>
+          <a href="#">india</a>
+          <a href="#">USA</a>
+          <a href="#">japan</a>
+          <a href="#">france</a>
+      </div>
+      <div class="box">
+          <h3>quick links</h3>
+          <a href="#">home</a>
+          <a href="#">category</a>
+          <a href="#">product</a>
+          <a href="#">deal</a>
+          <a href="#">contact</a>
+      </div>
+      <div class="box">
+          <h3>follow us</h3>
+          <a href="#">facebook</a>
+          <a href="#">twitter</a>
+          <a href="#">instagram</a>
+          <a href="#">linked</a>
+      </div>
+
+  </div>
+
+  {% comment %} <h1 class="credit"> created by <span> mr. web designer </span> | all rights reserved! </h1> {% endcomment %}
+  
+</section>
+
+<!-- footer section ends -->
+
+<!-- scroll top button  -->
+<a href="#home" class="scroll-top fas fa-angle-up"></a>
+
+<script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+<!-- custom js file link  -->
+<script src="/script.js"></script>
+
+  <script>
+    (function () {
+      // The width and height of the captured photo. We will set the
+      // width to the value defined here, but the height will be
+      // calculated based on the aspect ratio of the input stream.
+
+      var width = 320;    // We will scale the photo width to this
+      var height = 0;     // This will be computed based on the input stream
+
+      // |streaming| indicates whether or not we're currently streaming
+      // video from the camera. Obviously, we start at false.
+
+      var streaming = false;
+
+      // The various HTML elements we need to configure or control. These
+      // will be set by the startup() function.
+
+      var video = null;
+      var canvas = null;
+      var photo = null;
+      var formsrc = null;
+      var startbutton = null;
+
+      function startup() {
+        video = document.getElementById('video');
+        canvas = document.getElementById('canvas');
+        photo = document.getElementById('photo');
+        formsrc = document.getElementById('webimg');
+        startbutton = document.getElementById('startbutton');
+
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+          .then(function (stream) {
+            video.srcObject = stream;
+            video.play();
+          })
+          .catch(function (err) {
+            console.log("An error occurred: " + err);
+          });
+
+        video.addEventListener('canplay', function (ev) {
+          if (!streaming) {
+            height = video.videoHeight / (video.videoWidth / width);
+
+            // Firefox currently has a bug where the height can't be read from
+            // the video, so we will make assumptions if this happens.
+
+            if (isNaN(height)) {
+              height = width / (4 / 3);
+            }
+
+            video.setAttribute('width', width);
+            video.setAttribute('height', height);
+            canvas.setAttribute('width', width);
+            canvas.setAttribute('height', height);
+            streaming = true;
+          }
+        }, false);
+
+        startbutton.addEventListener('click', function (ev) {
+          takepicture();
+          ev.preventDefault();
+        }, false);
+
+        clearphoto();
+      }
+
+      // Fill the photo with an indication that none has been
+      // captured.
+
+      function clearphoto() {
+        var context = canvas.getContext('2d');
+        context.fillStyle = "#AAA";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+
+        var data = canvas.toDataURL('image/png');
+        photo.setAttribute('src', data);
+      }
+
+      // Capture a photo by fetching the current contents of the video
+      // and drawing it into a canvas, then converting that to a PNG
+      // format data URL. By drawing it on an offscreen canvas and then
+      // drawing that to the screen, we can change its size and/or apply
+      // other changes before drawing it.
+
+      function takepicture() {
+        var context = canvas.getContext('2d');
+        if (width && height) {
+          canvas.width = width;
+          canvas.height = height;
+          context.drawImage(video, 0, 0, width, height);
+
+          var data = canvas.toDataURL('image/png');
+          photo.setAttribute('src', data);
+          formsrc.setAttribute('value', data);
+        } else {
+          clearphoto();
+        }
+      }
+
+      // Set up our event listener to run the startup process
+      // once loading is complete.
+      window.addEventListener('load', startup, false);
+    })();
+  </script>
+</body>
+{% endblock %}
+
+</html>
