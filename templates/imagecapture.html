@@ -2,6 +2,7 @@
 <html>
 {% block content %}
 {% load static %}
+{% load socialaccount %}
 
 <head>
   <title>Camera</title>
@@ -23,54 +24,30 @@
 
   <header>
 
-    <div class="header-1">
-
-      {% comment %} <div class="share">
-        <span> follow us : </span>
-        <a href="#" class="fab fa-facebook-f"></a>
-        <a href="#" class="fab fa-twitter"></a>
-        <a href="#" class="fab fa-instagram"></a>
-        <a href="#" class="fab fa-linkedin"></a>
-      </div> {% endcomment %}
-
-      <div class="call">
-        <span> call us : </span>
-        <a href="#">+123-456-7890</a>
-      </div>
-
-    </div>
-
     <div class="header-2">
 
-      <a href="#" class="logo"> <i class="fas fa-seedling"></i> LOGO </a>
+      <a href="#" class="logo"> <i class="fas fa-seedling"></i> PlantsGram </a>
 
       <form action="" class="search-bar-container">
-        <input type="search" id="search-bar" placeholder="search here...">
-        <label for="search-bar" class="fas fa-search"></label>
+          <input type="search" id="search-bar" placeholder="search here...">
+          <label for="search-bar" class="fas fa-search"></label>
       </form>
 
-    </div>
+  </div>
 
-    <div class="header-3">
+  <div class="header-3">
 
       <div id="menu-bar" class="fas fa-bars"></div>
 
       <nav class="navbar">
-        <a href="#home">home</a>
-        <a href="#category">category</a>
-        <a href="#product">product</a>
-        <a href="#deal">deal</a>
-        <a href="#contact">contact</a>
-      </nav>
-
-      <div class="icons">
-        <a href="#" class="fas fa-shopping-cart"></a>
-        <a href="#" class="fas fa-heart"></a>
-        <a href="#" class="fas fa-user-circle"></a>
-      </div>
-
-    </div>
-
+          <div class="call">
+          <!-- {% if user.is_authenticated %}
+              <a href="/logout">Welcome, {{ user.username }}</a>
+          {% else %}
+              <a href="{% provider_login_url 'google' %}">Login With Google</a>
+          {% endif %} -->
+          </nav>
+  </div>
   </header>
 
   <!-- header section ends -->
