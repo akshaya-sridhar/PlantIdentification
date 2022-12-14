@@ -14,13 +14,17 @@ from django.core.files.storage import default_storage
 import glob
 import boto3
 import json
+import requests
 
 # Create your views here.
 
 
-
 def home(request):
     return render(request, 'index.html')
+
+
+def diseasedetection(request):
+    return render(request, 'diseasedetection.html')
 
 
 def imagecapture(request):
@@ -42,7 +46,7 @@ def imagecapture(request):
             urlopen(image_path).read()))
         a = 'C:\\Users\\aksha\\plant_iden\\plantpro\\media\\B.jpg'
         # s3.Bucket('rekogniz1811').upload_file(a, '', ExtraArgs={'ACL':'public-read'})
-        s3.upload_file(a, "rekogniz1811", "B.jpg",
+        s3.upload_file(a, "rekogniz1812", "B.jpg",
                        ExtraArgs={'ACL': 'public-read'})
 
         # return HttpResponse('Done!')
@@ -68,12 +72,12 @@ def awsdetect(request):
     b = ''
     try:
         s3 = boto3.resource('s3')
-        model = 'arn:aws:rekognition:us-east-1:240133793648:project/plantdataset/version/plantdataset.2022-11-22T15.24.15/1669110856686'
+        model = 'arn:aws:rekognition:us-east-1:608940411829:project/PlantDetection/version/PlantDetection.2022-12-14T11.05.09/1670996110142'
         client = boto3.client('rekognition')
         # Call DetectCustomLabels
-        response = client.detect_custom_labels(Image={'S3Object': {'Bucket': 'rekogniz1811', 'Name': 'B.jpg'}},
-                                            MinConfidence=95,
-                                            ProjectVersionArn=model)
+        response = client.detect_custom_labels(Image={'S3Object': {'Bucket': 'rekogniz1812', 'Name': 'B.jpg'}},
+                                               MinConfidence=95,
+                                               ProjectVersionArn=model)
 
         print(response['CustomLabels'])
         a = response['CustomLabels']
@@ -82,7 +86,31 @@ def awsdetect(request):
             b = i['Name']
             print('Confidence ' + str(i['Confidence']))
             print(b)
-    except: 
+        app_id = 'da35d90f'
+        app_key = '7fc86bc9688108fcd0ab1cce57884a7a'
+
+        # url
+        url = 'https://api.edamam.com/search?q=' + b + \
+            '&app_id=' + app_id + '&app_key=' + app_key
+
+        # get response
+        response = requests.get(url)
+
+        # get json
+        data = response.json()
+
+        # get recipes
+        recipes = data['hits']
+
+        # print recipes in json format
+        print(json.dumps(recipes, indent=1))
+                
+    except:
+
         return HttpResponse('Nothing has been detected!!')
-            
-    return render(request, 'aws.html', {'b': b})
+
+    return render(request, 'aws.html', {'b': b,'recipes':recipes})
+
+
+def info(request):
+    return render(request, 'description.html')
