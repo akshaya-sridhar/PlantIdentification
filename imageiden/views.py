@@ -24,6 +24,29 @@ def home(request):
 
 
 def diseasedetection(request):
+    s3 = boto3.client('s3')
+    if request.method == 'POST':
+        image_path = request.POST["src"]
+        image = NamedTemporaryFile()
+        urlopen(image_path).read()
+        image.write(urlopen(image_path).read())
+        image.flush()
+        image = File(image)
+        name = str(image.name).split('\\')[-1]
+        name += '.jpg'  # store image in jpeg format
+        image.name = name
+        with open('image.txt', 'w+') as file:
+            file.write(str(name))
+        # os.remove('C:\\Users\\aksha\\plant_iden\\plantpro\\media\\C.jpg')
+        default_storage.save('C:\\Users\\aksha\\plant_iden\\plantpro\\media\\C.jpg', ContentFile(
+            urlopen(image_path).read()))
+        a = 'C:\\Users\\aksha\\plant_iden\\plantpro\\media\\C.jpg'
+        # s3.Bucket('rekogniz1811').upload_file(a, '', ExtraArgs={'ACL':'public-read'})
+        s3.upload_file(a, "rekognize1120", "C.jpg",
+                       ExtraArgs={'ACL': 'public-read'})
+
+        # return HttpResponse('Done!')
+        return redirect('aws2/')
     return render(request, 'diseasedetection.html')
 
 
@@ -110,6 +133,29 @@ def awsdetect(request):
         return HttpResponse('Nothing has been detected!!')
 
     return render(request, 'aws.html', {'b': b,'recipes':recipes})
+
+def awsdiseasedetect(request):
+    DiseaseDetection = ''
+    try:
+        s3 = boto3.resource('s3')
+        model = 'arn:aws:rekognition:us-east-1:608940411829:project/PlantDiseaseDetection/version/PlantDiseaseDetection.2022-12-16T13.24.05/1671177246455'
+        client = boto3.client('rekognition')
+        # Call DetectCustomLabels
+        response = client.detect_custom_labels(Image={'S3Object': {'Bucket': 'rekognize1120', 'Name': 'C.jpg'}},
+                                               MinConfidence=65,
+                                               ProjectVersionArn=model)
+
+        print(response['CustomLabels'])
+        a = response['CustomLabels']
+        for i in response['CustomLabels']:
+            print('Label ' + str(i['Name']))
+            DiseaseDetection = i['Name']
+            print('Confidence ' + str(i['Confidence']))
+            print(DiseaseDetection)
+    except Exception as e:
+        print(e)
+        return HttpResponse('Nothing has been detected!!')
+    return render(request, 'aws2.html', {'DiseaseDetection': DiseaseDetection})
 
 
 def info(request):

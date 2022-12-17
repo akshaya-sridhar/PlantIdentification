@@ -10,5 +10,6 @@ urlpatterns = [
     path('imagecapture',views.imagecapture, name='imagecapture'),
     path('diseasedetection',views.diseasedetection, name='diseasedetection'),
     path('aws/', views.awsdetect, name = 'aws'),
+    path('aws2/', views.awsdiseasedetect, name = 'aws2'),
     path('info',views.info,name='info'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
